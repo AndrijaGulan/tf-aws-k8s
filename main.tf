@@ -148,3 +148,38 @@ resource "aws_lb_listener" "k8s_listener" {
   }
 }
 
+resource "aws_key_pair" "k8s_key" {
+  key_name   = "kubernetes"
+  public_key = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQDLzwArEhK0Gb+dwvb0/BhL7yqAtm6dVCutTx3JoIbK2oRk6xJzMTtgqN+IUK/01KGD8CZLIDn851fizaSbAf9PCrcpxbFWr3nuu88tUIK7Len3KP9mL8ba3AkNzZGWTNcr2ldm7tbzaNwa1Z2Twk69oPik32i5u2Z4t4lKZKd6K0m/ChB3CFuS/8It7BpipyCNEjZUykhIbqg91xerMPFpgjJKc8GmoYs9KAC9SsLmbYL/yjUJCAWoY57RHehx6bzUfT3nbV3b9ptbLeCe6ubvdBQG0NMD+nnqJdKD9TXnYaLkRQEqySRFnGcjYjFiZgTB743PSxUfVE3Uq6/pcQfhxSrjVu4FXIENj76CrzZGCCJQND+0gfJTSToKYCAoT/dJU/ywYOTo/NLsAPb3to/Habl5PztM/Jwim7CYlc3hlwErbda7kBhsu8l43XAYA7T5g7MHoR//oaIskDmba4uZpVSJvhcXz0/cmbGy2tthOs8ttewX89sVGQ5HsmGSwAue+nYrcbqCN7qAAxY6z2Os1DQX5Y8FhPZXPp0c4SoARfDGnCfVEELe2zgo6ERvoQgx2C6QHYGRpXKSyEYV2xOJHjQvGyoZsgV2CTZvjfX2UPdUwsdh0vTj997keY2YLLcrzmIZa1mhRZPpnZ96NTqi5zTfNXjpTxMKNXzs4qCPYQ== andrija@united.rs"
+}
+
+###K8S CONTROLLERS###
+resource "aws_instance" "controller" {
+  for_each      = toset(["0", "1", "2"])
+  ami           = data.aws_ami.ubuntu20.id
+  instance_type = "t3.micro"
+  key_name      = aws_key_pair.k8s_key.key_name
+
+  private_ip             = "10.0.1.1${each.key}"
+  subnet_id              = aws_subnet.kubernetes.id
+  vpc_security_group_ids = [aws_security_group.k8s_sg.id]
+  associate_public_ip    = true
+  tags = {
+    Name = "controller-${each.key}"
+  }
+}
+resource "aws_instance" "worker" {
+  for_each      = toset(["0", "1", "2"])
+  ami           = data.aws_ami.ubuntu20.id
+  instance_type = "t3.micro"
+  key_name      = aws_key_pair.k8s_key.key_name
+
+  private_ip             = "10.0.1.2${each.key}"
+  subnet_id              = aws_subnet.kubernetes.id
+  vpc_security_group_ids = [aws_security_group.k8s_sg.id]
+  associate_public_ip    = true
+  tags = {
+    Name    = "worker-${each.key}"
+    PodCidr = "10.200.${each.key}.0/24"
+  }
+}
