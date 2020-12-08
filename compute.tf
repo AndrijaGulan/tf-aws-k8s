@@ -45,6 +45,6 @@ resource "aws_instance" "worker" {
   associate_public_ip_address = true
   tags = {
     Name     = "worker-${each.key}"
-    pod_cidr = "10.200.${each.key}.0/24"
+    pod-cidr = "10.200.${each.key}.0/24"
   }
 }
