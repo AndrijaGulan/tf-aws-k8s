@@ -44,7 +44,7 @@ resource "aws_instance" "worker" {
   vpc_security_group_ids      = [aws_security_group.k8s_sg.id]
   associate_public_ip_address = true
   tags = {
-    Name    = "worker-${each.key}"
-    PodCidr = "10.200.${each.key}.0/24"
+    Name     = "worker-${each.key}"
+    pod_cidr = "10.200.${each.key}.0/24"
   }
 }
