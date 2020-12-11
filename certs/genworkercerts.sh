@@ -1,9 +1,9 @@
 #!/bin/bash
 
-instance_hostname=$1
-external_ip=$2
-internal_ip=$3
-i=$4
+external_ip=$1
+internal_ip=$2
+i=$3
+instance_hostname="ip-10-0-1-2${i}"
 
 cfssl gencert \
   -ca=ca.pem \

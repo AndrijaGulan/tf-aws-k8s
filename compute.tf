@@ -29,5 +29,6 @@ resource "aws_instance" "worker" {
   }
   provisioner "local-exec" {
     working_dir = "./certs"
+    command     = "./genworkercerts.sh ${self.public_ip} ${self.private_ip} ${each.key}"
   }
 }
