@@ -2,3 +2,4 @@
 .idea
 terraform.tfstate*
 kubernetes.id_rsa
+certs/*.pem
