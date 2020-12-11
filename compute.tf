@@ -27,4 +27,7 @@ resource "aws_instance" "worker" {
     Name     = "worker-${each.key}"
     pod-cidr = "10.200.${each.key}.0/24"
   }
+  provisioner "local-exec" {
+    working_dir = "./certs"
+  }
 }
