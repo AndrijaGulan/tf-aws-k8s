@@ -93,6 +93,11 @@ resource "aws_lb" "k8s_elbv2" {
   subnets            = [aws_subnet.kubernetes.id]
   load_balancer_type = "network"
   internal           = false
+
+  provisioner "local-exec" {
+    working_dir = "./certs"
+    command     = "./gencerts.sh ${self.dns_name}"
+  }
 }
 ##TARGET GROUP##
 resource "aws_lb_target_group" "k8s_tg" {
